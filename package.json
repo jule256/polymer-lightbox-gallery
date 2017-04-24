@@ -1,0 +1,17 @@
+{
+  "name": "polymer-lightbox-gallery",
+  "version": "0.0.2",
+  "author": "Julian Mollik <jule@creative-coding.net>",
+  "description": "a Polymer implementation of Digitec's product lightbox system",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-style-modules": "^0.1.0"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jule256/polymer-lightbox-gallery"
+  }
+}
