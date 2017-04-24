@@ -1,0 +1,50 @@
+@import 'commons';
+@import 'mixins';
+
+#container {
+  width: $d-min-width-stage + $d-width-navigation_control + $d-width-navigation_control;
+  height: $d-min-height-stage;
+}
+
+.navigation_dots_control {
+  display: flex;
+  justify-content: center;
+
+  div {
+    border: 1px solid $c-primary;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 6px 0 0;
+
+    &.is-active {
+      background-color: $c-primary;
+    }
+
+    &:last-of-type {
+      margin-right: 0;
+    }
+
+    &:hover {
+      background-color: $c-primary;
+      cursor: pointer;
+    }
+  }
+
+  @include debug-background();
+}
+
+.navigation_info {
+  margin: 8px 0 0 0;
+  color: $c-primary;
+  @include text();
+  text-align: center;
+
+  &:hover {
+    color: $c-secondary;
+    cursor: pointer;
+  }
+
+  @include debug-background();
+}
+

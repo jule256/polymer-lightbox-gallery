@@ -1,0 +1,270 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="./lightbox-stage.html">
+<link rel="import" href="./behaviors/lightbox-hover-behavior.html">
+<link rel="import" href="./behaviors/lightbox-auxiliary-behavior.html">
+<link rel="import" href="lightbox-popup-styles.html">
+
+<dom-module id="lightbox-popup">
+  <template>
+    <style is="custom-style" include="lightbox-popup-styles"></style>
+
+    <div class="modalpane" hidden$="[[isHidden]]" on-tap="_closePopup">
+      <div id="container" class="modal_container ds">
+        <div class="controls_close" on-tap="_closePopup">
+          &times;
+        </div>
+        <lightbox-stage
+          on-mouseenter="_activateStageHover"
+          on-mouseleave="_deactivateStageHover"
+          id="lightbox-stage"
+          active-index="{{activeIndex}}"
+          images-basepath="[[imagesBasepath]]"
+          images="[[imagesLarge]]"
+        ></lightbox-stage>
+        <div id="image_info">
+          <div class="image_info_title">
+            [[_getTextForIndex(activeIndex, textsTitle)]]
+          </div>
+          <div class="image_info_description">
+            [[_getTextForIndex(activeIndex, textsDescription)]]
+          </div>
+        </div>
+        <div id="navigation-thumbnails">
+          <div class="thumbnails-container" style$="[[_calculateThumbnailsContainerOffsetStyle(activeIndex, _thumbnailWidth, _thumbnailsWidth, imagesThumbnail.length)]]">
+            <template id="navigation-control-repeater" is="dom-repeat" items="[[imagesThumbnail]]" as="imageThumbnail">
+              <div on-tap="navigateTo" class$="[[getNavigationActiveClass(index, activeIndex)]]">
+                <div>
+                  <img src="[[imagesBasepath]]/[[imageThumbnail]]" width="[[_thumbnailWidth]]" alt="" title="" />
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      /**
+       * this string will be added to the url when opening the popup to manage close-on-browser-back-button
+       * @type {String}
+       */
+      var POPUP_HASH = 'popup';
+
+      /**
+       * since the addEventListener() function has it's own this-context, we need to store this Polymer elements this
+       * context in a self variable
+       * @type {Object}
+       */
+      var self;
+
+      Polymer({
+        is: 'lightbox-popup',
+
+        properties: {
+          isHidden: {
+            type: Boolean,
+            value: true,
+            notify: true,
+            observer: '_isHiddenChanged'
+          },
+          imagesBasepath: {
+            type: String
+          },
+          imagesLarge: {
+            type: Array,
+            value: []
+          },
+          imagesThumbnail: {
+            type: Array,
+            value: []
+          },
+          /**
+           * an array of title texts with the same index order as the images* arrays
+           */
+          textsTitle: {
+            type: Array,
+            value: []
+          },
+          /**
+           * an array of description texts with the same index order as the images* arrays
+           */
+          textsDescription: {
+            type: Array,
+            value: []
+          },
+          activeIndex: {
+            type: Number,
+            value: 0,
+            notify: true
+          },
+          _thumbnailsWidth: {
+            type: Number,
+            value: 0
+          },
+          /**
+           * the width of a single thumbnail image
+           */
+          _thumbnailWidth: {
+            type: Number,
+            value: 150
+          }
+        },
+
+        behaviors: [
+          /**
+           * @type {Object}
+           * @property {Object} IronResizableBehavior
+           */
+          Polymer.IronResizableBehavior,
+          LightboxBehaviors.LightboxHoverBehavior,
+          LightboxBehaviors.LightboxAuxiliaryBehavior
+        ],
+
+        listeners: {
+          'iron-resize': 'calculateThumbnailsWidth'
+        },
+
+        /**
+         * attached callback
+         *   - stores the this context of this Polymer component as self
+         *   - adds event listener for the popstate (close popup on return)
+         *   - adds event listener for keyboard events
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        attached: function() {
+          self = this;
+
+          window.addEventListener('popstate', function() {
+            self.set('isHidden', true);
+          });
+
+          window.addEventListener('keydown', this._keyboardListener);
+        },
+
+        /**
+         * callback function for the keyboad listener (reacts only if popup is not hidden, because keyboard navigation
+         * should NOT work in the non-popup stage)
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {Object} event
+         * @private
+         */
+        _keyboardListener: function(event) {
+          if (!self.isHidden) {
+            var $stage = self.$['lightbox-stage'];
+            if (event.keyCode === 37) {
+              $stage.navigatePrevious();
+            }
+            else if (event.keyCode === 39) {
+              $stage.navigateNext();
+            }
+          }
+        },
+
+        /**
+         * calculates the horizontal offset of the "moving part" inside the thumbnails and returns a string usable for
+         * an HTML style attribute
+         *
+         * uses translate3d() (instead of margin-left) to make use of graphics-card-acceleration
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {Number} activeIndex
+         * @param {Number} thumbnailWidth
+         * @param {Number} thumbnailsWidth
+         * @param {Number} total
+         * @returns {string}
+         * @private
+         */
+        _calculateThumbnailsContainerOffsetStyle: function(activeIndex, thumbnailWidth, thumbnailsWidth, total) {
+          var spaceNeeded,
+            maximumOffsetPixel,
+            maximumOffsetIndex;
+
+          if (activeIndex * thumbnailWidth + thumbnailWidth > thumbnailsWidth) {
+            // the end of the thumbnail of the active image is outside the visible area → move further
+
+            if ((total - activeIndex) * thumbnailWidth < thumbnailsWidth) {
+              // there are no more hidden thumbnails right of the space → don't move further
+              spaceNeeded = total * thumbnailWidth;
+              maximumOffsetPixel = spaceNeeded - thumbnailsWidth;
+              maximumOffsetIndex = Math.ceil(maximumOffsetPixel / thumbnailWidth);
+              return 'transform: translate3d(-' + (maximumOffsetIndex * thumbnailWidth) + 'px, 0px, 0px);';
+            }
+
+            return 'transform: translate3d(-' + (activeIndex * thumbnailWidth) + 'px, 0px, 0px);';
+          }
+          return '';
+        },
+
+        /**
+         * returns the value of the passed index of the passed texts array
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @return {Number} index
+         * @return {Array} texts
+         * @return {String}
+         * @private
+         */
+        _getTextForIndex: function(index, texts) {
+          return texts[index];
+        },
+
+        /**
+         * callback function for the iron-resize behavior (can also be called from 'the outside') sets the thumbnails
+         * width
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        calculateThumbnailsWidth: function() {
+          var width = this.$['navigation-thumbnails'].offsetWidth;
+          this.set('_thumbnailsWidth', width);
+        },
+
+        /**
+         * observer for changes on the popup visibility
+         * if the popup is visible, initiates a calculation of the stage with and a calculation of the thumbnails width
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {Boolean} newValue
+         * @private
+         */
+        _isHiddenChanged: function(newValue) {
+          if (newValue === false) {
+            // popup is now visible
+            this.$['lightbox-stage'].calculateStageWidth();
+
+            // push state to enable browser-backbutton-functionality
+            history.pushState(null, '', '#' + POPUP_HASH);
+
+            this.calculateThumbnailsWidth();
+          }
+        },
+
+        /**
+         * callback function for tapping on the modal-pane or the close-button
+         * closes the lightbox by setting the components isHidden variable to true
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {object} event
+         * @private
+         */
+        _closePopup: function(event) {
+          var classNames = event.path[0].className.split(' ');
+          if (classNames.indexOf('modalpane') !== -1 || classNames.indexOf('controls_close') !== -1) {
+            // only close if the clicked element has the class 'modalpane' or 'controls_close'
+            this.set('isHidden', true);
+
+            // remove the hash on close via modal-pane or close-button
+            window.location.hash = window.location.hash.replace(POPUP_HASH, '');
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

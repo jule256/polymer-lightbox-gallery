@@ -1,0 +1,42 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+  window.LightboxBehaviors = window.LightboxBehaviors || {};
+
+  (function(LightboxBehaviors) {
+    'use strict';
+
+    LightboxBehaviors.LightboxHoverBehavior = {
+
+      /**
+       * callback function for a mouse-over adds the class 'is-hovered' to the lightbox-stage
+       *
+       * @author Julian Mollik <jule@creative-coding.net>
+       * @private
+       */
+      _activateStageHover: function() {
+        /**
+         * @type {Object}
+         * @property {Object} $.lightbox_stage
+         */
+        this.$['lightbox-stage'].classList.add('is-hovered');
+      },
+
+      /**
+       * callback function for a mouse-out removes the class 'is-hovered' from the lightbox-stage
+       *
+       * @author Julian Mollik <jule@creative-coding.net>
+       * @private
+       */
+      _deactivateStageHover: function() {
+        /**
+         * @type {Object}
+         * @property {Object} $.lightbox_stage
+         */
+        this.$['lightbox-stage'].classList.remove('is-hovered');
+      }
+    };
+  })(window.LightboxBehaviors);
+
+</script>
+

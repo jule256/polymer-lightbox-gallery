@@ -1,0 +1,122 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./lightbox-popup.html">
+<link rel="import" href="./lightbox-stage.html">
+<link rel="import" href="./behaviors/lightbox-hover-behavior.html">
+<link rel="import" href="./behaviors/lightbox-auxiliary-behavior.html">
+<link rel="import" href="lightbox-gallery-styles.html">
+
+<dom-module id="lightbox-gallery">
+  <template>
+    <style is="custom-style" include="lightbox-gallery-styles"></style>
+
+    <div id="container">
+      <div id="navigation-wrapper">
+        <lightbox-stage
+          on-mouseenter="_activateStageHover"
+          on-mouseleave="_deactivateStageHover"
+          id="lightbox-stage"
+          active-index="{{activeIndex}}"
+          images-basepath="[[imagesBasepath]]"
+          images="[[imagesMedium]]"
+        ></lightbox-stage>
+        <div class="navigation_dots_wrapper" on-mouseenter="_activateStageHover" on-mouseleave="_deactivateStageHover">
+          <div class="navigation_dots_control">
+            <template id="navigation-control-repeater" is="dom-repeat" items="[[imagesMedium]]" as="imageMedium">
+              <div on-tap="navigateTo" class$="[[getNavigationActiveClass(index, activeIndex)]]"></div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div class="navigation_info" on-tap="_openPopup">
+        [[imagesMedium.length]] Bilder
+      </div>
+    </div>
+    <lightbox-popup
+      is-hidden="{{_isLightboxPopupHidden}}"
+      images-basepath="[[imagesBasepath]]"
+      images-large="[[imagesLarge]]"
+      images-thumbnail="[[imagesThumbnail]]"
+      texts-title="[[textsTitle]]"
+      texts-description="[[textsDescription]]"
+      active-index="{{activeIndex}}"
+    ></lightbox-popup>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'lightbox-gallery',
+        properties: {
+          imagesBasepath: {
+            type: String
+          },
+          imagesLarge: {
+            type: Array,
+            value: []
+          },
+          imagesMedium: {
+            type: Array,
+            value: []
+          },
+          imagesThumbnail: {
+            type: Array,
+            value: []
+          },
+          /**
+           * an array of title texts with the same index order as the images* arrays
+           */
+          textsTitle: {
+            type: Array,
+            value: []
+          },
+          /**
+           * an array of description texts with the same index order as the images* arrays
+           */
+          textsDescription: {
+            type: Array,
+            value: []
+          },
+          activeIndex: {
+            type: Number,
+            value: 0
+          },
+          /**
+           * defines the with of the stage, should be identical to the SCSS variable $d-width-wrapper
+           */
+          _stageWidth: {
+            type: Number,
+            value: 302
+          },
+          /**
+           * defines if the lightbox-popup is open (false) or closed (true, default)
+           */
+          _isLightboxPopupHidden: {
+            type: Boolean,
+            value: true
+          }
+        },
+
+        listeners: {
+          'lightbox-stage.image-tap': '_openPopup'
+        },
+
+        behaviors: [
+          LightboxBehaviors.LightboxHoverBehavior,
+          LightboxBehaviors.LightboxAuxiliaryBehavior
+        ],
+
+        /**
+         * initiates the opening of the popup by setting the according variable to false
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @private
+         */
+        _openPopup: function() {
+          this.set('_isLightboxPopupHidden', false);
+        }
+      });
+    })();
+  </script>
+</dom-module>

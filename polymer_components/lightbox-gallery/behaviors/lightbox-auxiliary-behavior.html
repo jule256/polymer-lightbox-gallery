@@ -1,0 +1,45 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+  window.LightboxBehaviors = window.LightboxBehaviors || {};
+
+  (function(LightboxBehaviors) {
+    'use strict';
+
+    LightboxBehaviors.LightboxAuxiliaryBehavior = {
+
+      /**
+       * returns the string 'is-active' if the passed parameters are identical, otherwise an empty string
+       *
+       * @author Julian Mollik <jule@creative-coding.net>
+       * @param {Number} index
+       * @param {Number} activeIndex
+       * @return {String}
+       * @private
+       */
+      getNavigationActiveClass: function(index, activeIndex) {
+        return index === activeIndex ? 'is-active' : '';
+      },
+
+      /**
+       * gets the active index from the repeater and sets this component's activeIndex to this value
+       *
+       * assumes that the DOM-ID of the repeater is 'navigation-control-repeater'
+       *
+       * @author Julian Mollik <jule@creative-coding.net>
+       * @param {Object} event
+       * @private
+       */
+      navigateTo: function(event) {
+        /**
+         * @type {Object}
+         * @property {function} $.navigation-control-repeater.indexForElement
+         */
+        var newIndex = this.$['navigation-control-repeater'].indexForElement(event.target);
+        this.set('activeIndex', newIndex);
+      }
+    };
+  })(window.LightboxBehaviors);
+
+</script>
+

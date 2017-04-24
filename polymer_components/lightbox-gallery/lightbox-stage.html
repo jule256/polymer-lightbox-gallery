@@ -1,0 +1,171 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="lightbox-stage-styles.html">
+
+<dom-module id="lightbox-stage">
+  <template>
+    <style is="custom-style" include="lightbox-stage-styles"></style>
+
+    <div id="container">
+      <div id="previous" class="navigation_control_container">
+        <div class="navigation_control" on-tap="navigatePrevious"></div>
+      </div>
+      <div id="images-stage">
+        <div id="images-container" style$="[[_calculateImagesContainerOffsetStyle(activeIndex, _stageWidth)]]">
+          <template is="dom-repeat" items="[[images]]" as="imageMedium">
+            <div class="image-container" on-tap="_handleImageTap">
+              <img src="[[imagesBasepath]]/[[imageMedium]]" width="[[_stageWidth]]" alt="" title="" />
+            </div>
+          </template>
+        </div>
+      </div>
+      <div id="next" class="navigation_control_container">
+        <div class="navigation_control" on-tap="navigateNext"></div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'lightbox-stage',
+
+        properties: {
+          isHidden: {
+            type: Boolean,
+            value: true,
+            notify: true
+          },
+          imagesBasepath: {
+            type: String
+          },
+          /**
+           * the array of image-filenames
+           */
+          images: {
+            type: Array,
+            value: []
+          },
+          /**
+           * the index of the currently active image
+           */
+          activeIndex: {
+            type: Number,
+            value: 0,
+            notify: true
+          },
+          /**
+           * defines the with of the stage, should be identical to the SCSS variable $d-width-wrapper
+           */
+          _stageWidth: {
+            type: Number,
+            value: 302
+          }
+        },
+
+        behaviors: [
+          /**
+           * @type {Object}
+           * @property {Object} IronResizableBehavior
+           */
+          Polymer.IronResizableBehavior
+        ],
+
+        listeners: {
+          'iron-resize': 'calculateStageWidth'
+        },
+
+        /**
+         * callback function for the iron-resize behavior (can also be called from 'the outside') sets the stage-width
+         * to the currently available space between the 'next' and 'previous' buttons
+         *
+         * adds the class 'no-animation' to the images-container while resizing to prevent weird animations
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        calculateStageWidth: function() {
+          var $imagesContainer = this.$['images-container'];
+          $imagesContainer.classList.add('no-animation');
+          var width = this.$['images-stage'].offsetWidth;
+          this.set('_stageWidth', width);
+          this.async(function() {
+            $imagesContainer.classList.remove('no-animation');
+          });
+        },
+
+        /**
+         * callback function for a tap on the main image, fires the event 'image-tap' with the payload of the currently
+         * active index
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        _handleImageTap: function() {
+          /**
+           * @type {Object}
+           * @property {Function} fire
+           */
+          this.fire(
+            'image-tap',
+            {
+              activeIndex: this.activeIndex
+            }
+          );
+        },
+
+        /**
+         * callback function for the tap on previous, sets the activeIndex to the previous index
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        navigatePrevious: function() {
+          this.set('activeIndex', this._getNewActiveIndex(this.activeIndex, this.images.length, -1));
+        },
+
+        /**
+         * callback function for the tap on next, sets the activeIndex to the next index
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         */
+        navigateNext: function() {
+          this.set('activeIndex', this._getNewActiveIndex(this.activeIndex, this.images.length, 1));
+        },
+
+        /**
+         * calculates the next (if direction parameter is 1) or previous (if direction parameter is -1) index based on
+         * the passed activeIndex and the total parameter (representing the total number of elements)
+         *
+         * next index of the last element is the first element
+         * previos index of the first element is the last element
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {Number} activeIndex
+         * @param {Number} total
+         * @param {Number} direction
+         * @return {Number}
+         * @private
+         */
+        _getNewActiveIndex: function(activeIndex, total, direction) {
+          return (activeIndex + direction + total) % total;
+        },
+
+        /**
+         * calculates the horizontal offset of the "moving part" inside the stage and returns a string usable for an
+         * HTML style attribute
+         *
+         * uses translate3d() (instead of margin-left) to make use of graphics-card-acceleration
+         *
+         * @author Julian Mollik <jule@creative-coding.net>
+         * @param {Number} activeIndex
+         * @param {Number} stageWidth
+         * @returns {string}
+         * @private
+         */
+        _calculateImagesContainerOffsetStyle: function(activeIndex, stageWidth) {
+          return 'transform: translate3d(-' + (activeIndex * stageWidth) + 'px, 0px, 0px);';
+        }
+      });
+    })();
+  </script>
+</dom-module>
