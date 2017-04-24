@@ -1,0 +1,29 @@
+// debug mixin
+$debug: true;
+$debug: false;
+@mixin debug-background() {
+  @if $debug {
+    $opacity: (random(30) + 20) / 100; // random value between 0.2 and 0.5
+    $red: random(255);
+    $green: random(255);
+    $blue: random(255);
+    background: rgba($red, $green, $blue, $opacity);
+  }
+}
+
+// font family
+@mixin font-family {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+// font text normal
+@mixin text {
+  @include font-family();
+  font-size: 13px;
+}
+
+// font text small
+@mixin text-small {
+  @include font-family();
+  font-size: 11px;
+}
