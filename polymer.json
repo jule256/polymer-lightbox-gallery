@@ -1,0 +1,15 @@
+{
+  "entrypoint": "index.html",
+  "shell": "polymer_components/lightbox-gallery/lightbox-gallery.html",
+  "fragments": [
+
+  ],
+  "sourceGlobs": [
+    "polymer_components/**/*",
+    "images/**/*",
+    "bower.json"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}
