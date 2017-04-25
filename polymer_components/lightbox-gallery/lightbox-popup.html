@@ -248,14 +248,20 @@
 
         /**
          * callback function for tapping on the modal-pane or the close-button
-         * closes the lightbox by setting the components isHidden variable to true
+         * closes the lightbox by
+         *   - setting the components isHidden variable to true
+         *   - removing the popup-hash from the url
          *
          * @author Julian Mollik <jule@creative-coding.net>
          * @param {object} event
          * @private
          */
         _closePopup: function(event) {
-          var classNames = event.path[0].className.split(' ');
+          /**
+           * @type {Object}
+           * @property {Object} event.detail.sourceEvent
+           */
+          var classNames = event.detail.sourceEvent.target.className.split(' ');
           if (classNames.indexOf('modalpane') !== -1 || classNames.indexOf('controls_close') !== -1) {
             // only close if the clicked element has the class 'modalpane' or 'controls_close'
             this.set('isHidden', true);
