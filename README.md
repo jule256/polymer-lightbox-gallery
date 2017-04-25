@@ -8,7 +8,7 @@ I wanted to create a similar user experience as  [this lightbox/gallery system](
 
 ## demo
 
-here is [the polymer-lightbox-gallery component](https://www.creative-coding.net/demo/polymer-lightbox-gallery/) in action, best viewed in Chrome (see [possible-improvements](#possible improvements)). 
+here is [the polymer-lightbox-gallery component](https://www.creative-coding.net/demo/polymer-lightbox-gallery/) in action, best viewed in Chrome (see [possible-improvements](https://github.com/jule256/polymer-lightbox-gallery#possible-improvements)). 
 
 ## features
 * clicking on a _medium_ image element in the gallery opens the lightbox scrolled to the related _large_ image
