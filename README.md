@@ -6,6 +6,10 @@ a [Polymer](https://www.polymer-project.org/) implementation of [Digitec](https:
 
 I wanted to create a similar user experience as  [this lightbox/gallery system](https://www.digitec.ch/de/s1/product/corsair-gaming-k55-rgb-usb-ch-kabel-tastatur-5992745) provides. And I wanted to use Polymer as library because web components rule.
 
+## demo
+
+here is [the polymer-lightbox-gallery component](https://www.creative-coding.net/demo/polymer-lightbox-gallery/) in action, best viewed in Chrome (see [possible-improvements](#possible improvements)). 
+
 ## features
 * clicking on a _medium_ image element in the gallery opens the lightbox scrolled to the related _large_ image
 * clicking on the _X_ closes the lightbox
@@ -45,6 +49,11 @@ I wanted to create a similar user experience as  [this lightbox/gallery system](
 
 ## possible improvements
 
+* browser compatibility:
+  * _Mozilla Firefox_ & _Microsoft Internet Explorer 11_ do not allow closing via close-button or modal click
+  * _Microsoft Edge_ does not show the popup
+  * _Microsoft Internet Explorer 11_ does not completly draw the separator between thumbnais and stage
+  * _Microsoft Internet Explorer 11_ does not center the stage vertically
 * full responsive design (lightbox should be screen filling below a certain width)
 * horizontal swiping to go to the next/previous image
 * improve infinite navigation by getting rid of the left-scroll when clicking "next" on the last element (duplicate first DOM element after the last DOM element?)
