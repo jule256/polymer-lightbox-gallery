@@ -52,7 +52,7 @@ here is [the polymer-lightbox-gallery component](https://www.creative-coding.net
 * browser compatibility:
   * _Mozilla Firefox_ & _Microsoft Internet Explorer 11_ do not allow closing via close-button or modal click
   * _Microsoft Edge_ does not show the popup
-  * _Microsoft Internet Explorer 11_ does not completly draw the separator between thumbnais and stage
+  * _Microsoft Internet Explorer 11_ does not completly draw the separator between thumbnails and stage
   * _Microsoft Internet Explorer 11_ does not center the stage vertically
 * full responsive design (lightbox should be screen filling below a certain width)
 * horizontal swiping to go to the next/previous image
